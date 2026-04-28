@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的奥德赛时期</title>
+<style>
+:root {
+  --bg-deep: #0a0d14;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2235;
+  --text-primary: #e8ecf2;
+  --text-secondary: #8a96a8;
+  --text-muted: #4a5568;
+  --accent: #6b8cce;
+  --accent-glow: rgba(107,140,206,0.35);
+  --border: rgba(107,140,206,0.18);
+  --star-color: rgba(255,255,255,0.85);
+  --gold: #c9a96e;
+  --day-hue: 210;
+  --font-main: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --page-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 80px rgba(107,140,206,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  user-select: none;
+}
+
+/* ==================== STAR BACKGROUND ==================== */
+#star-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ==================== LOADING / COVER ==================== */
+#cover {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+#cover.fade-out { opacity: 0; visibility: hidden; }
+
+.cover-title {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--text-primary);
+  opacity: 0;
+  animation: fadeUp 1.2s 0.5s forwards;
+}
+.cover-subtitle {
+  font-size: clamp(0.75rem, 2vw, 1rem);
+  letter-spacing: 0.5em;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  opacity: 0;
+  animation: fadeUp 1.2s 1s forwards;
+}
+.cover-waves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeIn 2s 1.5s forwards;
+}
+.cover-waves svg { width: 100%; height: 100%; }
+
+.cover-enter {
+  margin-top: 3rem;
+  padding: 0.7em 2.5em;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeUp 1s 2s forwards;
+  transition: var(--transition);
+}
+.cover-enter:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes wave {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ==================== MAIN APP ==================== */
+#app {
+  display: none;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* TOPBAR */
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 2rem;
+  background: rgba(10, 13, 20, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+#topbar-title {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  flex: 1;
+  transition: opacity 0.3s;
+}
+#topbar-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+#progress-bar-wrap {
+  width: 80px;
+  height: 2px;
+  background: rgba(107,140,206,0.2);
+  border-radius: 2px;
+}
+#progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+.icon-btn:hover {
+  background: var(--accent-glow);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+/* SEARCH OVERLAY */
+#search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(10,13,20,0.95);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+}
+#search-overlay.active { display: flex; }
+#search-box {
+  width: min(600px, 90vw);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--page-shadow);
+}
+#search-input {
+  width: 100%;
+  padding: 1.2rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 1.1rem;
+  outline: none;
+}
+#search-results {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.search-result-item {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 0.5rem;
+}
+.search-result-item:hover { background: var(--bg-card-hover); }
+.search-result-label {
+  font-size: 0.7rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+}
+.search-result-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.search-result-text em { color: var(--gold); font-style: normal; }
+#search-close {
+  display: block;
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+#search-close:hover { color: var(--text-secondary); }
+#search-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* FLIP BOOK */
+#book {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  perspective: 2000px;
+  overflow: hidden;
+}
+
+.page {
+  position: absolute;
+  inset: 0;
+  padding: 80px 5% 60px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.page.active { display: flex; }
+
+.page-inner {
+  width: 100%;
+  max-width: 800px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: var(--page-shadow);
+  animation: pageIn 0.5s ease;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* PAGE NAV */
+.page-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(17,24,39,0.8);
+  backdrop-filter: blur(10px);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: var(--transition);
+}
+.page-nav:hover { background: var(--accent-glow); color: var(--text-primary); border-color: var(--accent); }
+.page-nav:disabled { opacity: 0.2; cursor: default; }
+#nav-prev { left: 1.5rem; }
+#nav-next { right: 1.5rem; }
+
+/* DOTS */
+#dots {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+.dot:hover:not(.active) { background: var(--text-secondary); }
+
+/* ==================== PAGE CONTENT STYLES ==================== */
+
+/* Cover Page */
+#page-cover {
+  background: radial-gradient(ellipse at 30% 20%, rgba(107,140,206,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 80%, rgba(201,169,110,0.08) 0%, transparent 50%),
+              var(--bg-deep);
+}
+.page-cover-inner { text-align: center; }
+.cover-deco-star {
+  width: 1px;
+  height: 1px;
+  border-radius: 50%;
+  background: var(--star-color);
+  margin: 0 auto 2.5rem;
+  box-shadow: 0 0 12px 3px rgba(255,255,255,0.3);
+  animation: twinkle 3s ease-in-out infinite;
+}
+.cover-big-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: 0.4em;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+.cover-big-sub {
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.5em;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+}
+.cover-quote {
+  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+  color: var(--text-muted);
+  font-style: italic;
+  letter-spacing: 0.1em;
+  padding: 1.5rem 2rem;
+  border-left: 2px solid var(--border);
+  border-right: 2px solid var(--border);
+  margin: 0 auto 2rem;
+  max-width: 500px;
+  line-height: 2;
+}
+.cover-scroll-hint {
+  margin-top: 2rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Section Title Page */
+.page-section-title {
+  text-align: center;
+}
+.section-num {
+  font-size: 4rem;
+  font-weight: 200;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.section-name {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--text-primary);
+}
+.section-line {
+  width: 60px;
+  height: 1px;
+  background: var(--accent);
+  margin: 1.5rem auto 0;
+}
+
+/* Daily Entry */
+.entry-date {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+.entry-weekday {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: var(--text-primary);
+}
+.entry-section-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.8rem;
+  margin-top: 1.8rem;
+}
+.entry-section-label:first-of-type { margin-top: 0; }
+.entry-body {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 2.1;
+  margin-bottom: 0.8rem;
+  text-indent: 2em;
+}
+.entry-quote {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-style: italic;
+  border-left: 2px solid var(--accent);
+  padding-left: 1.2rem;
+  margin: 1.5rem 0;
+  line-height: 2;
+  opacity: 0.85;
+}
+.insight-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 0.2em 0.7em;
+  border-radius: 20px;
+  background: rgba(107,140,206,0.15);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+}
+.insight-card {
+  background: rgba(17,24,39,0.6);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+.insight-card-quote {
+  font-size: 1rem;
+  color: var(--text-primary);
+  border-left: 3px solid var(--gold);
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  font-style: italic;
+}
+.insight-card-body {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 2;
+}
+.insight-card-body p { margin-bottom: 0.5rem; }
+
+/* Collapsible Entry Toggle */
+.entry-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  margin-top: 1.5rem;
+  padding: 0.5rem 0;
+  transition: var(--transition);
+}
+.entry-toggle:hover { color: var(--text-primary); }
+.entry-toggle-icon { font-size: 0.7rem; transition: transform 0.3s; }
+.entry-toggle.open .entry-toggle-icon { transform: rotate(180deg); }
+.entry-hidden { display: none; }
+.entry-hidden.show { display: block; }
+
+/* About Page */
+.about-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 2.2;
+  text-align: justify;
+}
+.about-text.center { text-align: center; }
+.about-sep {
+  text-align: center;
+  color: var(--border);
+  letter-spacing: 0.5em;
+  margin: 2rem 0;
+  font-size: 0.8rem;
+}
+
+/* Float Action Button */
+#fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: flex-end;
+}
+.fab-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: var(--transition);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.fab-btn:hover { background: var(--accent-glow); color: var(--text-primary); border-color: var(--accent); transform: scale(1.1); }
+
+/* Card Wall Overlay */
+#card-wall {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(10,13,20,0.97);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 5% 40px;
+  overflow-y: auto;
+}
+#card-wall.active { display: flex; }
+#card-wall-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 2rem;
+}
+#card-wall-title {
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  color: var(--text-primary);
+}
+#card-wall-close {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+}
+#card-wall-close:hover { color: var(--text-primary); }
+#card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 900px;
+}
+.wall-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  animation: wallCardIn 0.4s ease;
+}
+.wall-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px var(--accent-glow); }
+@keyframes wallCardIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.wall-card-theme { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 0.8rem; }
+.wall-card-quote { font-size: 0.92rem; color: var(--text-primary); line-height: 1.7; font-style: italic; margin-bottom: 1rem; border-left: 2px solid var(--gold); padding-left: 0.8rem; }
+.wall-card-date { font-size: 0.7rem; color: var(--text-muted); }
+.wall-card-detail {
+  display: none;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 2;
+  white-space: pre-wrap;
+}
+.wall-card.expanded .wall-card-detail { display: block; }
+
+/* Print Styles */
+@media print {
+  body { background: white; color: #222; overflow: auto; }
+  #topbar, #nav-prev, #nav-next, #dots, #fab, #card-wall, #search-overlay { display: none !important; }
+  #book { height: auto; perspective: none; }
+  .page { position: static; display: flex !important; page-break-after: always; height: auto; min-height: 100vh; }
+  .page-inner { box-shadow: none; border: 1px solid #ddd; }
+  .entry-quote, .insight-card { border-color: #888; }
+  .cover-waves, #star-canvas { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Star Background -->
+<canvas id="star-canvas"></canvas>
+
+<!-- Loading / Cover -->
+<div id="cover">
+  <div class="cover-deco-star"></div>
+  <div class="cover-title">我的奥德赛时期</div>
+  <div class="cover-subtitle">—— 一段漂泊与归途的记录</div>
+  <div class="cover-waves">
+    <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
+      <path d="M0,100 C200,160 400,40 600,100 C800,160 1000,40 1200,100 C1400,160 1440,100 1440,100 L1440,200 L0,200 Z" fill="rgba(107,140,206,0.08)">
+        <animate attributeName="d" dur="8s" repeatCount="indefinite"
+          values="M0,100 C200,160 400,40 600,100 C800,160 1000,40 1200,100 C1400,160 1440,100 1440,100 L1440,200 L0,200 Z;
+                  M0,100 C200,40 400,160 600,100 C800,40 1000,160 1200,100 C1400,40 1440,100 1440,100 L1440,200 L0,200 Z;
+                  M0,100 C200,160 400,40 600,100 C800,160 1000,40 1200,100 C1400,160 1440,100 1440,100 L1440,200 L0,200 Z"/>
+      </path>
+    </svg>
+  </div>
+  <button class="cover-enter" onclick="enterBook()">进入奥德赛</button>
+</div>
+
+<!-- Main App -->
+<div id="app">
+
+  <!-- Topbar -->
+  <div id="topbar">
+    <div id="topbar-title">我的奥德赛时期</div>
+    <div id="topbar-progress">
+      <span id="progress-text">1 / 6</span>
+      <div id="progress-bar-wrap"><div id="progress-bar-fill"></div></div>
+    </div>
+    <button class="icon-btn" onclick="openSearch()" title="搜索">⌕</button>
+    <button class="icon-btn" onclick="printDoc()" title="打印 / PDF">⎙</button>
+    <button class="icon-btn" onclick="toggleCardWall()" title="慢慢想明白的事">✦</button>
+  </div>
+
+  <!-- Flip Book -->
+  <div id="book">
+
+    <!-- Page 0: Cover -->
+    <div class="page active" id="page-0">
+      <div class="page-inner page-cover-inner">
+        <div class="cover-deco-star"></div>
+        <div class="cover-big-title">我的奥德赛时期</div>
+        <div class="cover-big-sub">—— 一段属于我自己的漂泊与归途</div>
+        <div class="cover-quote">"奥德修斯航行了十年才到家，<br>我也要走好自己的那段路。"</div>
+        <div class="cover-scroll-hint">↓ 向下翻阅</div>
+      </div>
+    </div>
+
+    <!-- Page 1: Daily Records Intro -->
+    <div class="page" id="page-1">
+      <div class="page-inner page-section-title">
+        <div class="section-num">01</div>
+        <div class="section-name">每日记录</div>
+        <div class="section-line"></div>
+        <div class="about-text center" style="margin-top:2rem; color: var(--text-secondary); font-size:0.9rem; line-height:2.2;">
+          这里记录每一个真实的日子。<br>
+          不是大事记，只是你活过的证据。
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 2: Entry - Apr 28 -->
+    <div class="page" id="page-2">
+      <div class="page-inner">
+        <div class="entry-date">2026年4月28日</div>
+        <div class="entry-weekday">周二</div>
+
+        <div class="section-heading">每日记录</div>
+
+        <div class="entry-section-label">【今日心境】</div>
+        <div class="entry-body">今天到目前为止都比较平静，但平静下面藏着一点紧张——马上要需求评审了。紧张是真的，但好像也没到慌的地步。像是暴风雨前那种把一切都摊开来等一等的感觉。</div>
+        <div class="entry-body">内心另一层，是隔着一段距离的恍惚。那件事情已经过去一个月了，可回头看，真的有种恍如隔世的错觉。时间过得很慢，也很快。</div>
+
+        <div class="entry-section-label">【今日记事】</div>
+        <div class="entry-body">▸ 上午和 Nick 讨论五一去哪里玩。讨论来讨论去、绕了一大圈，最后还是回到泰国🇹🇭——不想把所有时间都花在越南。两个人认真地讨论了半天，得出了一个本来就想好的答案，真的是挺好笑的。</div>
+        <div class="entry-body">▸ 偷偷看了一眼内审的调查文档，昨晚有人看过了。不知道什么时候出结果，心里做好了可能要留处分的准备。但事情发生到现在，已经过去一个月，像是很久远的事了。</div>
+        <div class="entry-body">▸ 下午准备面对需求评审。稳住。</div>
+        <div class="entry-body">▸ 下午的时候，老板突然在微信上发了一句话，然后又立刻撤回了。就那么几秒钟，看见了一行字，还没来得及看清，就消失了。发出的那一刻他是想说点什么的，但他选择不说。这比完全沉默更伤人。</div>
+        <div class="entry-body">▸ 这就是坐冷板凳的感觉吧。以前每天密集的讨论，现在是非必要不沟通。俨然已经变成了一个快要出局的棋子♟️——maybe，已经出局了。虽然早有心理准备，但真的置身于内的时候，还是觉得难以接受。也别无他法。</div>
+
+        <div class="entry-section-label">【给自己的一句话】</div>
+        <div class="entry-quote">棋子被出局，是因为棋局结束了，或者换了一盘棋。可是你的人生不是一盘棋。你还在和 Nick 讨论五一去哪里玩，你还在记录这份文档，你还在往前走。</div>
+      </div>
+    </div>
+
+    <!-- Page 3: Insights Intro -->
+    <div class="page" id="page-3">
+      <div class="page-inner page-section-title">
+        <div class="section-num">02</div>
+        <div class="section-name">慢慢想明白的事</div>
+        <div class="section-line"></div>
+        <div class="about-text center" style="margin-top:2rem; color: var(--text-secondary); font-size:0.9rem; line-height:2.2;">
+          不是某一天发生的<br>
+          是某一天突然长出来的
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 4: Insight Card 1 -->
+    <div class="page" id="page-4">
+      <div class="page-inner">
+        <div class="entry-date">2026年4月28日</div>
+        <div class="entry-section-label">✦ 关于「渡过」与「解决」</div>
+        <div class="insight-card">
+          <div class="insight-card-quote">"不管结果怎么样，你已经在往前走了。"</div>
+          <div class="insight-card-body">
+            <p>人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。</p>
+            <p><strong style="color:var(--text-primary)">解决是动词，渡过是状态。</strong></p>
+            <p>解决需要答案，渡过只需要时间和一些温柔的话——像扶着河边的栏杆慢慢走过桥。没有战胜，只是每天都继续生活。然后有一天回头一看，桥已经在身后了。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page 5: Insight Card 2 -->
+    <div class="page" id="page-5">
+      <div class="page-inner">
+        <div class="entry-date">2026年4月28日</div>
+        <div class="entry-section-label">✦ 关于「战胜」与「共存」</div>
+        <div class="insight-card">
+          <div class="insight-card-quote">"你没有战胜那件事，你只是每天都继续生活。"</div>
+          <div class="insight-card-body">
+            <p>「战胜」这个词本身就有问题——它假设了你和那件事是对立的，必须把它打倒、踩在脚下、才算过关。</p>
+            <p>但那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。</p>
+            <p>能做的只是——<strong style="color:var(--text-primary)">让它变小一点。不是消失，是比例变小。</strong></p>
+            <p>一个月前，它可能占据你生活的 90%。今天，它只是你偷偷看一眼内审文档的那 10 秒钟。剩下的时间，你在和 Nick 讨论泰国、在准备评审、在记录这份文档。</p>
+            <p style="color:var(--gold); margin-top:1rem;">它没有变小——是你的生活长大了。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /book -->
+
+  <!-- Page Navigation -->
+  <button class="page-nav" id="nav-prev" onclick="prevPage()" disabled>‹</button>
+  <button class="page-nav" id="nav-next" onclick="nextPage()">›</button>
+
+  <!-- Dots -->
+  <div id="dots"></div>
+
+  <!-- Float Action Buttons -->
+  <div id="fab">
+    <button class="fab-btn" onclick="prevPage()" title="上一页">‹</button>
+    <button class="fab-btn" onclick="nextPage()" title="下一页">›</button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- Search Overlay -->
+<div id="search-overlay">
+  <div id="search-box">
+    <input type="text" id="search-input" placeholder="搜索关键词…" oninput="doSearch()" autofocus>
+    <div id="search-results"></div>
+    <div id="search-close" onclick="closeSearch()">ESC 或点击这里关闭</div>
+  </div>
+</div>
+
+<!-- Card Wall -->
+<div id="card-wall">
+  <div id="card-wall-header">
+    <div id="card-wall-title">✦ 慢慢想明白的事</div>
+    <button id="card-wall-close" onclick="toggleCardWall()">✕</button>
+  </div>
+  <div id="card-grid"></div>
+</div>
+
+<script>
+// ==================== DATA ====================
+const PAGES = 6;
+const today = '2026年4月28日';
+
+const insights = [
+  {
+    date: today,
+    theme: '关于「渡过」与「解决」',
+    quote: '"不管结果怎么样，你已经在往前走了。"',
+    body: `人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。
+
+解决是动词，渡过是状态。
+
+解决需要答案，渡过只需要时间和一些温柔的话——像扶着河边的栏杆慢慢走过桥。没有战胜，只是每天都继续生活。然后有一天回头一看，桥已经在身后了。`
+  },
+  {
+    date: today,
+    theme: '关于「战胜」与「共存」',
+    quote: '"你没有战胜那件事，你只是每天都继续生活。"',
+    body: `「战胜」这个词本身就有问题——它假设了你和那件事是对立的，必须把它打倒、踩在脚下、才算过关。
+
+但那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。
+
+能做的只是——让它变小一点。不是消失，是比例变小。
+
+一个月前，它可能占据你生活的 90%。今天，它只是你偷偷看一眼内审文档的那 10 秒钟。剩下的时间，你在和 Nick 讨论泰国、在准备评审、在记录这份文档。
+
+它没有变小——是你的生活长大了。`
+  }
+];
+
+// ==================== STARS ====================
+(function initStars() {
+  const canvas = document.getElementById('star-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let w, h;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    stars = Array.from({ length: 120 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.2 + 0.3,
+      speed: Math.random() * 0.015 + 0.005,
+      phase: Math.random() * Math.PI * 2,
+      maxA: Math.random() * 0.6 + 0.2
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    const t = Date.now() / 1000;
+    stars.forEach(s => {
+      const a = s.maxA * (0.3 + 0.7 * (Math.sin(t * s.speed * 10 + s.phase) * 0.5 + 0.5));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,215,240,${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+// ==================== BOOK ====================
+let currentPage = 0;
+
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + n);
+  if (page) {
+    page.classList.add('active');
+    page.scrollTop = 0;
+  }
+  currentPage = n;
+  updateNav();
+  updateProgress();
+}
+
+function updateNav() {
+  document.getElementById('nav-prev').disabled = currentPage === 0;
+  document.getElementById('nav-next').disabled = currentPage === PAGES - 1;
+}
+
+function updateProgress() {
+  document.getElementById('progress-text').textContent = `${currentPage + 1} / ${PAGES}`;
+  document.getElementById('progress-bar-fill').style.width = `${((currentPage + 1) / PAGES) * 100}%`;
+}
+
+function buildDots() {
+  const container = document.getElementById('dots');
+  for (let i = 0; i < PAGES; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => showPage(i);
+    container.appendChild(d);
+  }
+}
+
+function updateDots() {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentPage);
+  });
+}
+
+function nextPage() {
+  if (currentPage < PAGES - 1) {
+    showPage(currentPage + 1);
+    updateDots();
+  }
+}
+
+function prevPage() {
+  if (currentPage > 0) {
+    showPage(currentPage - 1);
+    updateDots();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (document.getElementById('cover').style.visibility === 'hidden') {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextPage(); updateDots(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevPage(); updateDots(); }
+    if (e.key === 'Escape') { closeSearch(); }
+  }
+});
+
+// Touch swipe
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) { nextPage(); updateDots(); }
+    else { prevPage(); updateDots(); }
+  }
+});
+
+// ==================== COVER ====================
+function enterBook() {
+  document.getElementById('cover').classList.add('fade-out');
+  setTimeout(() => {
+    document.getElementById('cover').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    buildDots();
+    showPage(0);
+  }, 1600);
+}
+
+// ==================== SEARCH ====================
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('active');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-input').focus();
+  document.getElementById('search-results').innerHTML = '';
+}
+
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('active');
+}
+
+const searchData = [
+  { label: '每日记录 · 4月28日', text: '今天到目前为止都比较平静，但平静下面藏着一点紧张——马上要需求评审了。' },
+  { label: '每日记录 · 4月28日', text: '上午和 Nick 讨论五一去哪里玩。讨论来讨论去、绕了一大圈，最后还是回到泰国🇹🇭。' },
+  { label: '每日记录 · 4月28日', text: '偷偷看了一眼内审的调查文档，昨晚有人看过了。不知道什么时候出结果。' },
+  { label: '慢慢想明白的事 · 关于「渡过」与「解决」', text: '人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。' },
+  { label: '慢慢想明白的事 · 关于「渡过」与「解决」', text: '解决是动词，渡过是状态。' },
+  { label: '慢慢想明白的事 · 关于「战胜」与「共存」', text: '你没有战胜那件事，你只是每天都继续生活。' },
+  { label: '慢慢想明白的事 · 关于「战胜」与「共存」', text: '那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。' },
+  { label: '慢慢想明白的事 · 关于「战胜」与「共存」', text: '它没有变小——是你的生活长大了。' },
+];
+
+function doSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  const resultsEl = document.getElementById('search-results');
+  if (!q) { resultsEl.innerHTML = ''; return; }
+  const results = searchData.filter(item =>
+    item.text.includes(q) || item.label.includes(q)
+  );
+  if (results.length === 0) {
+    resultsEl.innerHTML = '<div id="search-empty">没有找到相关内容</div>';
+    return;
+  }
+  resultsEl.innerHTML = results.map(r => {
+    const highlighted = r.text.replace(new RegExp(q, 'g'), `<em>${q}</em>`);
+    return `<div class="search-result-item" onclick="jumpToSearchResult('${r.label}')">
+      <div class="search-result-label">${r.label}</div>
+      <div class="search-result-text">${highlighted}</div>
+    </div>`;
+  }).join('');
+}
+
+function jumpToSearchResult(label) {
+  closeSearch();
+  if (label.includes('慢慢想明白')) {
+    showPage(4);
+  } else {
+    showPage(2);
+  }
+  updateDots();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSearch();
+});
+
+// ==================== CARD WALL ====================
+function buildCardWall() {
+  const grid = document.getElementById('card-grid');
+  grid.innerHTML = insights.map((ins, i) => `
+    <div class="wall-card" onclick="this.classList.toggle('expanded')">
+      <div class="wall-card-theme">${ins.theme}</div>
+      <div class="wall-card-quote">${ins.quote}</div>
+      <div class="wall-card-date">${ins.date}</div>
+      <div class="wall-card-detail">${ins.body}</div>
+    </div>
+  `).join('');
+}
+
+function toggleCardWall() {
+  const wall = document.getElementById('card-wall');
+  const isActive = wall.classList.toggle('active');
+  if (isActive) buildCardWall();
+}
+
+// ==================== PRINT ====================
+function printDoc() {
+  window.print();
+}
+
+// ==================== INIT ====================
+// After cover fades, app stays hidden until enter clicked
+</script>
+</body>
+</html>
