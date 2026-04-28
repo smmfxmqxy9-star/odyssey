@@ -34,7 +34,6 @@ body {
   user-select: none;
 }
 
-/* ==================== STAR BACKGROUND ==================== */
 #star-canvas {
   position: fixed;
   inset: 0;
@@ -42,7 +41,6 @@ body {
   pointer-events: none;
 }
 
-/* ==================== LOADING / COVER ==================== */
 #cover {
   position: fixed;
   inset: 0;
@@ -99,8 +97,8 @@ body {
   transition: var(--transition);
 }
 .cover-enter:hover {
-  background: var(--accent-glow);
-  border-color: var(--accent);
+  background: rgba(107,140,206,0.1);
+  box-shadow: 0 0 30px var(--accent-glow);
 }
 
 @keyframes fadeUp {
@@ -111,28 +109,8 @@ body {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-@keyframes wave {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
 
-/* ==================== MAIN APP ==================== */
-#app {
-  display: none;
-  height: 100vh;
-  position: relative;
-  z-index: 1;
-}
-
-/* TOPBAR */
+/* ==================== TOP BAR ==================== */
 #topbar {
   position: fixed;
   top: 0;
@@ -141,929 +119,704 @@ body {
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.8rem 2rem;
-  background: rgba(10, 13, 20, 0.85);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 56px;
+  background: linear-gradient(to bottom, var(--bg-deep) 60%, transparent);
+  opacity: 0;
+  transition: opacity 0.6s;
 }
-#topbar-title {
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  color: var(--text-secondary);
-  flex: 1;
-  transition: opacity 0.3s;
-}
-#topbar-progress {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-#progress-bar-wrap {
-  width: 80px;
-  height: 2px;
-  background: rgba(107,140,206,0.2);
-  border-radius: 2px;
-}
-#progress-bar-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
-  transition: width 0.4s ease;
-  width: 0%;
-}
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: var(--transition);
-}
-.icon-btn:hover {
-  background: var(--accent-glow);
-  color: var(--text-primary);
-  border-color: var(--accent);
-}
+#topbar.visible { opacity: 1; }
 
-/* SEARCH OVERLAY */
-#search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(10,13,20,0.95);
-  display: none;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 15vh;
-}
-#search-overlay.active { display: flex; }
-#search-box {
-  width: min(600px, 90vw);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--page-shadow);
-}
-#search-input {
-  width: 100%;
-  padding: 1.2rem 1.5rem;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-primary);
-  font-family: var(--font-main);
-  font-size: 1.1rem;
-  outline: none;
-}
-#search-results {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 1rem;
-}
-.search-result-item {
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: var(--transition);
-  margin-bottom: 0.5rem;
-}
-.search-result-item:hover { background: var(--bg-card-hover); }
-.search-result-label {
-  font-size: 0.7rem;
-  color: var(--accent);
+#progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
   letter-spacing: 0.1em;
-  margin-bottom: 0.3rem;
 }
-.search-result-text {
-  font-size: 0.9rem;
+#progress-dots { display: flex; gap: 6px; }
+.pdot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: 0.3s;
+}
+.pdot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+.pdot.done { background: rgba(107,140,206,0.4); }
+
+.top-btn {
+  background: none;
+  border: none;
   color: var(--text-secondary);
-  line-height: 1.6;
-}
-.search-result-text em { color: var(--gold); font-style: normal; }
-#search-close {
-  display: block;
-  text-align: center;
-  padding: 1rem;
-  color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
   transition: var(--transition);
 }
-#search-close:hover { color: var(--text-secondary); }
-#search-empty {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
+.top-btn:hover { color: var(--accent); background: rgba(107,140,206,0.1); }
 
-/* FLIP BOOK */
+/* ==================== BOOK CONTAINER ==================== */
 #book {
   position: relative;
   width: 100%;
   height: 100vh;
   perspective: 2000px;
-  overflow: hidden;
 }
 
 .page {
   position: absolute;
   inset: 0;
-  padding: 80px 5% 60px;
-  display: none;
-  flex-direction: column;
+  display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  padding: 80px 40px 40px;
 }
-.page.active { display: flex; }
 
 .page-inner {
   width: 100%;
-  max-width: 800px;
-  background: var(--bg-card);
+  max-width: 680px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding: 3rem 3.5rem;
+  background: rgba(17, 24, 39, 0.85);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 3rem;
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
   box-shadow: var(--page-shadow);
-  animation: pageIn 0.5s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
-@keyframes pageIn {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+.page-inner::-webkit-scrollbar { width: 4px; }
+.page-inner::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ==================== PAGE TRANSITIONS ==================== */
+.page-enter { animation: pageEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.page-exit { animation: pageExit 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateX(60px) scale(0.97); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes pageExit {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to { opacity: 0; transform: translateX(-60px) scale(0.97); }
 }
 
-/* PAGE NAV */
-.page-nav {
+/* ==================== TYPOGRAPHY ==================== */
+.entry-date {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+.entry-title {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.entry-section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.entry-section-label::before {
+  content: '✦';
+  font-size: 0.6rem;
+}
+.entry-body {
+  font-size: 0.95rem;
+  line-height: 2;
+  color: var(--text-secondary);
+  margin-bottom: 0.8rem;
+}
+.entry-body:first-of-type { color: var(--text-primary); }
+.entry-quote {
+  font-size: 0.95rem;
+  line-height: 2;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 1.5rem 2rem;
+  margin-top: 1rem;
+  border-left: 2px solid var(--accent);
+  background: rgba(107,140,206,0.05);
+  border-radius: 0 8px 8px 0;
+}
+.entry-divider {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.5em;
+  margin: 2.5rem 0;
+  opacity: 0.5;
+}
+
+/* Insight cards */
+.insight-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(107,140,206,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.insight-meta {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+.insight-quote {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+.insight-text {
+  font-size: 0.85rem;
+  line-height: 1.9;
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
+/* ==================== FLOATING CARDS WALL ==================== */
+#cards-overlay {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 50;
-  width: 48px;
-  height: 48px;
+  inset: 0;
+  z-index: 500;
+  background: rgba(10, 13, 20, 0.95);
+  backdrop-filter: blur(20px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+}
+#cards-overlay.open { display: flex; }
+
+.cards-wall {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.fcard {
+  padding: 1.5rem;
+  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  font-family: var(--font-main);
+}
+.fcard:hover {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.fcard-meta { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+.fcard-quote { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; line-height: 1.5; margin-bottom: 0.8rem; }
+.fcard-ref { font-size: 0.75rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+#cards-close {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(17,24,39,0.9);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 501;
+}
+#cards-close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+/* Card modal */
+#card-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: rgba(10,13,20,0.97);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+#card-modal.open { display: flex; }
+.card-modal-content {
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  text-align: left;
+}
+.card-modal-content::-webkit-scrollbar { width: 4px; }
+.card-modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.card-modal-quote { font-size: 1.2rem; color: var(--text-primary); font-weight: 500; line-height: 1.7; margin-bottom: 1.5rem; }
+.card-modal-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 2; white-space: pre-line; }
+#card-modal-close { margin-top: 2rem; background: var(--accent); border: none; color: #fff; font-size: 0.85rem; padding: 0.6em 1.5em; border-radius: 20px; cursor: pointer; transition: var(--transition); font-family: var(--font-main); }
+#card-modal-close:hover { box-shadow: 0 0 20px var(--accent-glow); }
+
+/* ==================== SEARCH ==================== */
+#search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(10,13,20,0.97);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+}
+#search-overlay.open { display: flex; }
+#search-input-wrap {
+  width: 100%;
+  max-width: 560px;
+  padding: 0 1.5rem;
+}
+#search-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  outline: none;
+  transition: var(--transition);
+}
+#search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+#search-results { margin-top: 1rem; }
+.sr-item {
+  padding: 1rem 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.sr-item:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+.sr-item mark { background: rgba(107,140,206,0.3); color: var(--accent); border-radius: 2px; padding: 0 2px; }
+#search-close {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(17,24,39,0.9);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 501;
+}
+#search-close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+
+/* ==================== NAV ==================== */
+.nav-hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  gap: 1rem;
+  opacity: 0;
+  transition: opacity 0.6s;
+  pointer-events: none;
+}
+.nav-hint.visible { opacity: 1; pointer-events: auto; }
+.nav-btn {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: rgba(17,24,39,0.8);
-  backdrop-filter: blur(10px);
   color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 1.2rem;
-  transition: var(--transition);
-}
-.page-nav:hover { background: var(--accent-glow); color: var(--text-primary); border-color: var(--accent); }
-.page-nav:disabled { opacity: 0.2; cursor: default; }
-#nav-prev { left: 1.5rem; }
-#nav-next { right: 1.5rem; }
-
-/* DOTS */
-#dots {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-muted);
   cursor: pointer;
   transition: var(--transition);
-}
-.dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
-.dot:hover:not(.active) { background: var(--text-secondary); }
-
-/* ==================== PAGE CONTENT STYLES ==================== */
-
-/* Cover Page */
-#page-cover {
-  background: radial-gradient(ellipse at 30% 20%, rgba(107,140,206,0.12) 0%, transparent 60%),
-              radial-gradient(ellipse at 70% 80%, rgba(201,169,110,0.08) 0%, transparent 50%),
-              var(--bg-deep);
-}
-.page-cover-inner { text-align: center; }
-.cover-deco-star {
-  width: 1px;
-  height: 1px;
-  border-radius: 50%;
-  background: var(--star-color);
-  margin: 0 auto 2.5rem;
-  box-shadow: 0 0 12px 3px rgba(255,255,255,0.3);
-  animation: twinkle 3s ease-in-out infinite;
-}
-.cover-big-title {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 300;
-  letter-spacing: 0.4em;
-  color: var(--text-primary);
-  margin-bottom: 0.8rem;
-}
-.cover-big-sub {
-  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
-  letter-spacing: 0.5em;
-  color: var(--text-secondary);
-  margin-bottom: 2.5rem;
-}
-.cover-quote {
-  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
-  color: var(--text-muted);
-  font-style: italic;
-  letter-spacing: 0.1em;
-  padding: 1.5rem 2rem;
-  border-left: 2px solid var(--border);
-  border-right: 2px solid var(--border);
-  margin: 0 auto 2rem;
-  max-width: 500px;
-  line-height: 2;
-}
-.cover-scroll-hint {
-  margin-top: 2rem;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.3em;
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Section Title Page */
-.page-section-title {
-  text-align: center;
-}
-.section-num {
-  font-size: 4rem;
-  font-weight: 200;
-  color: var(--border);
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-.section-name {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: 300;
-  letter-spacing: 0.3em;
-  color: var(--text-primary);
-}
-.section-line {
-  width: 60px;
-  height: 1px;
-  background: var(--accent);
-  margin: 1.5rem auto 0;
-}
-
-/* Daily Entry */
-.entry-date {
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  color: var(--accent);
-  margin-bottom: 0.3rem;
-}
-.entry-weekday {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-bottom: 2rem;
-}
-.section-heading {
-  font-size: 1.6rem;
-  font-weight: 300;
-  letter-spacing: 0.2em;
-  text-align: center;
-  margin-bottom: 2.5rem;
-  color: var(--text-primary);
-}
-.entry-section-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--gold);
-  letter-spacing: 0.15em;
-  margin-bottom: 0.8rem;
-  margin-top: 1.8rem;
-}
-.entry-section-label:first-of-type { margin-top: 0; }
-.entry-body {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 2.1;
-  margin-bottom: 0.8rem;
-  text-indent: 2em;
-}
-.entry-quote {
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  font-style: italic;
-  border-left: 2px solid var(--accent);
-  padding-left: 1.2rem;
-  margin: 1.5rem 0;
-  line-height: 2;
-  opacity: 0.85;
-}
-.insight-tag {
-  display: inline-block;
-  font-size: 0.65rem;
-  padding: 0.2em 0.7em;
-  border-radius: 20px;
-  background: rgba(107,140,206,0.15);
-  color: var(--accent);
-  border: 1px solid var(--border);
-  letter-spacing: 0.1em;
-  margin-bottom: 1rem;
-}
-.insight-card {
-  background: rgba(17,24,39,0.6);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.8rem;
-  margin-bottom: 1.5rem;
-}
-.insight-card-quote {
-  font-size: 1rem;
-  color: var(--text-primary);
-  border-left: 3px solid var(--gold);
-  padding-left: 1rem;
-  margin-bottom: 1rem;
-  line-height: 1.8;
-  font-style: italic;
-}
-.insight-card-body {
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-  line-height: 2;
-}
-.insight-card-body p { margin-bottom: 0.5rem; }
-
-/* Collapsible Entry Toggle */
-.entry-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  margin-top: 1.5rem;
-  padding: 0.5rem 0;
-  transition: var(--transition);
-}
-.entry-toggle:hover { color: var(--text-primary); }
-.entry-toggle-icon { font-size: 0.7rem; transition: transform 0.3s; }
-.entry-toggle.open .entry-toggle-icon { transform: rotate(180deg); }
-.entry-hidden { display: none; }
-.entry-hidden.show { display: block; }
-
-/* About Page */
-.about-text {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 2.2;
-  text-align: justify;
-}
-.about-text.center { text-align: center; }
-.about-sep {
-  text-align: center;
-  color: var(--border);
-  letter-spacing: 0.5em;
-  margin: 2rem 0;
-  font-size: 0.8rem;
-}
-
-/* Float Action Button */
-#fab {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 80;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  align-items: flex-end;
-}
-.fab-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  transition: var(--transition);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
-.fab-btn:hover { background: var(--accent-glow); color: var(--text-primary); border-color: var(--accent); transform: scale(1.1); }
+.nav-btn:hover { background: var(--bg-card-hover); border-color: var(--accent); color: var(--accent); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
 
-/* Card Wall Overlay */
-#card-wall {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  background: rgba(10,13,20,0.97);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  padding: 80px 5% 40px;
-  overflow-y: auto;
-}
-#card-wall.active { display: flex; }
-#card-wall-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 900px;
-  margin-bottom: 2rem;
-}
-#card-wall-title {
-  font-size: 1.1rem;
-  letter-spacing: 0.2em;
-  color: var(--text-primary);
-}
-#card-wall-close {
-  font-size: 1.5rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: var(--transition);
-  background: none;
-  border: none;
-  font-family: var(--font-main);
-}
-#card-wall-close:hover { color: var(--text-primary); }
-#card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.2rem;
-  width: 100%;
-  max-width: 900px;
-}
-.wall-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: var(--transition);
-  animation: wallCardIn 0.4s ease;
-}
-.wall-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px var(--accent-glow); }
-@keyframes wallCardIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-.wall-card-theme { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 0.8rem; }
-.wall-card-quote { font-size: 0.92rem; color: var(--text-primary); line-height: 1.7; font-style: italic; margin-bottom: 1rem; border-left: 2px solid var(--gold); padding-left: 0.8rem; }
-.wall-card-date { font-size: 0.7rem; color: var(--text-muted); }
-.wall-card-detail {
-  display: none;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 2;
-  white-space: pre-wrap;
-}
-.wall-card.expanded .wall-card-detail { display: block; }
-
-/* Print Styles */
+/* ==================== PRINT ==================== */
 @media print {
-  body { background: white; color: #222; overflow: auto; }
-  #topbar, #nav-prev, #nav-next, #dots, #fab, #card-wall, #search-overlay { display: none !important; }
-  #book { height: auto; perspective: none; }
-  .page { position: static; display: flex !important; page-break-after: always; height: auto; min-height: 100vh; }
-  .page-inner { box-shadow: none; border: 1px solid #ddd; }
-  .entry-quote, .insight-card { border-color: #888; }
-  .cover-waves, #star-canvas { display: none; }
+  #topbar, .nav-hint, #cards-overlay, #search-overlay, #card-modal, .nav-hint { display: none !important; }
+  .page { position: static; height: auto; padding: 2rem; }
+  .page-inner { max-height: none; overflow: visible; box-shadow: none; border: none; background: white; color: black; }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 640px) {
+  .page-inner { padding: 2rem 1.5rem; }
+  #topbar { padding: 0 1rem; }
+  .cards-wall { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- Star Background -->
 <canvas id="star-canvas"></canvas>
 
-<!-- Loading / Cover -->
+<!-- Cover -->
 <div id="cover">
-  <div class="cover-deco-star"></div>
   <div class="cover-title">我的奥德赛时期</div>
-  <div class="cover-subtitle">—— 一段漂泊与归途的记录</div>
+  <div class="cover-subtitle">一段漂泊与归途的记录</div>
+  <button class="cover-enter" onclick="enterBook()">进入奥德赛</button>
   <div class="cover-waves">
     <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
-      <path d="M0,100 C200,160 400,40 600,100 C800,160 1000,40 1200,100 C1400,160 1440,100 1440,100 L1440,200 L0,200 Z" fill="rgba(107,140,206,0.08)">
+      <path fill="rgba(107,140,206,0.15)" d="M0,100 C360,160 720,40 1080,100 C1260,130 1380,100 1440,100 L1440,200 L0,200 Z">
         <animate attributeName="d" dur="8s" repeatCount="indefinite"
-          values="M0,100 C200,160 400,40 600,100 C800,160 1000,40 1200,100 C1400,160 1440,100 1440,100 L1440,200 L0,200 Z;
-                  M0,100 C200,40 400,160 600,100 C800,40 1000,160 1200,100 C1400,40 1440,100 1440,100 L1440,200 L0,200 Z;
-                  M0,100 C200,160 400,40 600,100 C800,160 1000,40 1200,100 C1400,160 1440,100 1440,100 L1440,200 L0,200 Z"/>
+          values="M0,100 C360,160 720,40 1080,100 C1260,130 1380,100 1440,100 L1440,200 L0,200 Z;
+                  M0,100 C360,40 720,160 1080,100 C1260,70 1380,100 1440,100 L1440,200 L0,200 Z;
+                  M0,100 C360,160 720,40 1080,100 C1260,130 1380,100 1440,100 L1440,200 L0,200 Z"/>
+      </path>
+      <path fill="rgba(107,140,206,0.08)" d="M0,120 C480,80 960,160 1440,120 L1440,200 L0,200 Z">
+        <animate attributeName="d" dur="12s" repeatCount="indefinite"
+          values="M0,120 C480,80 960,160 1440,120 L1440,200 L0,200 Z;
+                  M0,120 C480,160 960,80 1440,120 L1440,200 L0,200 Z;
+                  M0,120 C480,80 960,160 1440,120 L1440,200 L0,200 Z"/>
       </path>
     </svg>
   </div>
-  <button class="cover-enter" onclick="enterBook()">进入奥德赛</button>
 </div>
 
-<!-- Main App -->
-<div id="app">
-
-  <!-- Topbar -->
-  <div id="topbar">
-    <div id="topbar-title">我的奥德赛时期</div>
-    <div id="topbar-progress">
-      <span id="progress-text">1 / 6</span>
-      <div id="progress-bar-wrap"><div id="progress-bar-fill"></div></div>
-    </div>
-    <button class="icon-btn" onclick="openSearch()" title="搜索">⌕</button>
-    <button class="icon-btn" onclick="printDoc()" title="打印 / PDF">⎙</button>
-    <button class="icon-btn" onclick="toggleCardWall()" title="慢慢想明白的事">✦</button>
+<!-- Top bar -->
+<div id="topbar">
+  <div id="progress-bar">
+    <span id="page-label">封面</span>
+    <div id="progress-dots"></div>
   </div>
-
-  <!-- Flip Book -->
-  <div id="book">
-
-    <!-- Page 0: Cover -->
-    <div class="page active" id="page-0">
-      <div class="page-inner page-cover-inner">
-        <div class="cover-deco-star"></div>
-        <div class="cover-big-title">我的奥德赛时期</div>
-        <div class="cover-big-sub">—— 一段属于我自己的漂泊与归途</div>
-        <div class="cover-quote">"奥德修斯航行了十年才到家，<br>我也要走好自己的那段路。"</div>
-        <div class="cover-scroll-hint">↓ 向下翻阅</div>
-      </div>
-    </div>
-
-    <!-- Page 1: Daily Records Intro -->
-    <div class="page" id="page-1">
-      <div class="page-inner page-section-title">
-        <div class="section-num">01</div>
-        <div class="section-name">每日记录</div>
-        <div class="section-line"></div>
-        <div class="about-text center" style="margin-top:2rem; color: var(--text-secondary); font-size:0.9rem; line-height:2.2;">
-          这里记录每一个真实的日子。<br>
-          不是大事记，只是你活过的证据。
-        </div>
-      </div>
-    </div>
-
-    <!-- Page 2: Entry - Apr 28 -->
-    <div class="page" id="page-2">
-      <div class="page-inner">
-        <div class="entry-date">2026年4月28日</div>
-        <div class="entry-weekday">周二</div>
-
-        <div class="section-heading">每日记录</div>
-
-        <div class="entry-section-label">【今日心境】</div>
-        <div class="entry-body">今天到目前为止都比较平静，但平静下面藏着一点紧张——马上要需求评审了。紧张是真的，但好像也没到慌的地步。像是暴风雨前那种把一切都摊开来等一等的感觉。</div>
-        <div class="entry-body">内心另一层，是隔着一段距离的恍惚。那件事情已经过去一个月了，可回头看，真的有种恍如隔世的错觉。时间过得很慢，也很快。</div>
-
-        <div class="entry-section-label">【今日记事】</div>
-        <div class="entry-body">▸ 上午和 Nick 讨论五一去哪里玩。讨论来讨论去、绕了一大圈，最后还是回到泰国🇹🇭——不想把所有时间都花在越南。两个人认真地讨论了半天，得出了一个本来就想好的答案，真的是挺好笑的。</div>
-        <div class="entry-body">▸ 偷偷看了一眼内审的调查文档，昨晚有人看过了。不知道什么时候出结果，心里做好了可能要留处分的准备。但事情发生到现在，已经过去一个月，像是很久远的事了。</div>
-        <div class="entry-body">▸ 下午准备面对需求评审。稳住。</div>
-        <div class="entry-body">▸ 下午的时候，老板突然在微信上发了一句话，然后又立刻撤回了。就那么几秒钟，看见了一行字，还没来得及看清，就消失了。发出的那一刻他是想说点什么的，但他选择不说。这比完全沉默更伤人。</div>
-        <div class="entry-body">▸ 这就是坐冷板凳的感觉吧。以前每天密集的讨论，现在是非必要不沟通。俨然已经变成了一个快要出局的棋子♟️——maybe，已经出局了。虽然早有心理准备，但真的置身于内的时候，还是觉得难以接受。也别无他法。</div>
-
-        <div class="entry-section-label">【给自己的一句话】</div>
-        <div class="entry-quote">棋子被出局，是因为棋局结束了，或者换了一盘棋。可是你的人生不是一盘棋。你还在和 Nick 讨论五一去哪里玩，你还在记录这份文档，你还在往前走。</div>
-      </div>
-    </div>
-
-    <!-- Page 3: Insights Intro -->
-    <div class="page" id="page-3">
-      <div class="page-inner page-section-title">
-        <div class="section-num">02</div>
-        <div class="section-name">慢慢想明白的事</div>
-        <div class="section-line"></div>
-        <div class="about-text center" style="margin-top:2rem; color: var(--text-secondary); font-size:0.9rem; line-height:2.2;">
-          不是某一天发生的<br>
-          是某一天突然长出来的
-        </div>
-      </div>
-    </div>
-
-    <!-- Page 4: Insight Card 1 -->
-    <div class="page" id="page-4">
-      <div class="page-inner">
-        <div class="entry-date">2026年4月28日</div>
-        <div class="entry-section-label">✦ 关于「渡过」与「解决」</div>
-        <div class="insight-card">
-          <div class="insight-card-quote">"不管结果怎么样，你已经在往前走了。"</div>
-          <div class="insight-card-body">
-            <p>人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。</p>
-            <p><strong style="color:var(--text-primary)">解决是动词，渡过是状态。</strong></p>
-            <p>解决需要答案，渡过只需要时间和一些温柔的话——像扶着河边的栏杆慢慢走过桥。没有战胜，只是每天都继续生活。然后有一天回头一看，桥已经在身后了。</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Page 5: Insight Card 2 -->
-    <div class="page" id="page-5">
-      <div class="page-inner">
-        <div class="entry-date">2026年4月28日</div>
-        <div class="entry-section-label">✦ 关于「战胜」与「共存」</div>
-        <div class="insight-card">
-          <div class="insight-card-quote">"你没有战胜那件事，你只是每天都继续生活。"</div>
-          <div class="insight-card-body">
-            <p>「战胜」这个词本身就有问题——它假设了你和那件事是对立的，必须把它打倒、踩在脚下、才算过关。</p>
-            <p>但那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。</p>
-            <p>能做的只是——<strong style="color:var(--text-primary)">让它变小一点。不是消失，是比例变小。</strong></p>
-            <p>一个月前，它可能占据你生活的 90%。今天，它只是你偷偷看一眼内审文档的那 10 秒钟。剩下的时间，你在和 Nick 讨论泰国、在准备评审、在记录这份文档。</p>
-            <p style="color:var(--gold); margin-top:1rem;">它没有变小——是你的生活长大了。</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /book -->
-
-  <!-- Page Navigation -->
-  <button class="page-nav" id="nav-prev" onclick="prevPage()" disabled>‹</button>
-  <button class="page-nav" id="nav-next" onclick="nextPage()">›</button>
-
-  <!-- Dots -->
-  <div id="dots"></div>
-
-  <!-- Float Action Buttons -->
-  <div id="fab">
-    <button class="fab-btn" onclick="prevPage()" title="上一页">‹</button>
-    <button class="fab-btn" onclick="nextPage()" title="下一页">›</button>
+  <div style="display:flex;gap:0.5rem;">
+    <button class="top-btn" onclick="openCards()" title="慢慢想明白的事">✦</button>
+    <button class="top-btn" onclick="openSearch()" title="搜索">⌕</button>
+    <button class="top-btn" onclick="window.print()" title="打印">⎙</button>
   </div>
+</div>
 
-</div><!-- /app -->
+<!-- Book -->
+<div id="book"></div>
 
-<!-- Search Overlay -->
+<!-- Floating cards wall -->
+<div id="cards-overlay">
+  <button id="cards-close" onclick="closeCards()">✕</button>
+  <div class="cards-wall" id="cards-wall"></div>
+</div>
+
+<!-- Card modal -->
+<div id="card-modal">
+  <div class="card-modal-content" id="card-modal-content">
+    <div class="card-modal-quote" id="card-modal-quote"></div>
+    <div class="card-modal-text" id="card-modal-text"></div>
+    <button id="card-modal-close" onclick="closeCardModal()">关闭</button>
+  </div>
+</div>
+
+<!-- Search -->
 <div id="search-overlay">
-  <div id="search-box">
-    <input type="text" id="search-input" placeholder="搜索关键词…" oninput="doSearch()" autofocus>
+  <button id="search-close" onclick="closeSearch()">✕</button>
+  <div id="search-input-wrap">
+    <input id="search-input" placeholder="搜索..." oninput="doSearch(this.value)" autofocus>
     <div id="search-results"></div>
-    <div id="search-close" onclick="closeSearch()">ESC 或点击这里关闭</div>
   </div>
 </div>
 
-<!-- Card Wall -->
-<div id="card-wall">
-  <div id="card-wall-header">
-    <div id="card-wall-title">✦ 慢慢想明白的事</div>
-    <button id="card-wall-close" onclick="toggleCardWall()">✕</button>
-  </div>
-  <div id="card-grid"></div>
+<!-- Nav -->
+<div class="nav-hint" id="nav-hint">
+  <button class="nav-btn" id="prev-btn" onclick="prevPage()">←</button>
+  <button class="nav-btn" id="next-btn" onclick="nextPage()">→</button>
 </div>
 
 <script>
-// ==================== DATA ====================
-const PAGES = 6;
-const today = '2026年4月28日';
+// ===== STAR FIELD =====
+const starCanvas = document.getElementById('star-canvas');
+const sctx = starCanvas.getContext('2d');
+let stars = [];
 
-const insights = [
-  {
-    date: today,
-    theme: '关于「渡过」与「解决」',
-    quote: '"不管结果怎么样，你已经在往前走了。"',
-    body: `人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。
-
-解决是动词，渡过是状态。
-
-解决需要答案，渡过只需要时间和一些温柔的话——像扶着河边的栏杆慢慢走过桥。没有战胜，只是每天都继续生活。然后有一天回头一看，桥已经在身后了。`
-  },
-  {
-    date: today,
-    theme: '关于「战胜」与「共存」',
-    quote: '"你没有战胜那件事，你只是每天都继续生活。"',
-    body: `「战胜」这个词本身就有问题——它假设了你和那件事是对立的，必须把它打倒、踩在脚下、才算过关。
-
-但那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。
-
-能做的只是——让它变小一点。不是消失，是比例变小。
-
-一个月前，它可能占据你生活的 90%。今天，它只是你偷偷看一眼内审文档的那 10 秒钟。剩下的时间，你在和 Nick 讨论泰国、在准备评审、在记录这份文档。
-
-它没有变小——是你的生活长大了。`
-  }
-];
-
-// ==================== STARS ====================
-(function initStars() {
-  const canvas = document.getElementById('star-canvas');
-  const ctx = canvas.getContext('2d');
-  let stars = [];
-  let w, h;
-
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    stars = Array.from({ length: 120 }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.2 + 0.3,
-      speed: Math.random() * 0.015 + 0.005,
-      phase: Math.random() * Math.PI * 2,
-      maxA: Math.random() * 0.6 + 0.2
-    }));
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, w, h);
-    const t = Date.now() / 1000;
-    stars.forEach(s => {
-      const a = s.maxA * (0.3 + 0.7 * (Math.sin(t * s.speed * 10 + s.phase) * 0.5 + 0.5));
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(200,215,240,${a})`;
-      ctx.fill();
+function initStars() {
+  starCanvas.width = window.innerWidth;
+  starCanvas.height = window.innerHeight;
+  stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push({
+      x: Math.random() * starCanvas.width,
+      y: Math.random() * starCanvas.height,
+      r: Math.random() * 1.5,
+      o: Math.random(),
+      speed: 0.002 + Math.random() * 0.005,
+      phase: Math.random() * Math.PI * 2
     });
-    requestAnimationFrame(draw);
-  }
-
-  resize();
-  draw();
-  window.addEventListener('resize', resize);
-})();
-
-// ==================== BOOK ====================
-let currentPage = 0;
-
-function showPage(n) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const page = document.getElementById('page-' + n);
-  if (page) {
-    page.classList.add('active');
-    page.scrollTop = 0;
-  }
-  currentPage = n;
-  updateNav();
-  updateProgress();
-}
-
-function updateNav() {
-  document.getElementById('nav-prev').disabled = currentPage === 0;
-  document.getElementById('nav-next').disabled = currentPage === PAGES - 1;
-}
-
-function updateProgress() {
-  document.getElementById('progress-text').textContent = `${currentPage + 1} / ${PAGES}`;
-  document.getElementById('progress-bar-fill').style.width = `${((currentPage + 1) / PAGES) * 100}%`;
-}
-
-function buildDots() {
-  const container = document.getElementById('dots');
-  for (let i = 0; i < PAGES; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.onclick = () => showPage(i);
-    container.appendChild(d);
   }
 }
 
-function updateDots() {
-  document.querySelectorAll('.dot').forEach((d, i) => {
-    d.classList.toggle('active', i === currentPage);
+function drawStars(t) {
+  sctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+  stars.forEach(s => {
+    sctx.beginPath();
+    sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    sctx.fillStyle = `rgba(255,255,255,${Math.abs(Math.sin(t * s.speed + s.phase))})`;
+    sctx.fill();
   });
 }
 
-function nextPage() {
-  if (currentPage < PAGES - 1) {
-    showPage(currentPage + 1);
-    updateDots();
+function animateStars(t) { drawStars(t); requestAnimationFrame(animateStars); }
+initStars();
+window.addEventListener('resize', initStars);
+animateStars(0);
+
+// ===== PAGES DATA =====
+const pages = [
+  {
+    label: '封面',
+    content: `
+      <div style="text-align:center;padding:1rem 0;">
+        <div style="font-size:0.75rem;letter-spacing:0.25em;color:var(--text-muted);margin-bottom:1rem;">2026年4月28日</div>
+        <h1 style="font-size:1.8rem;font-weight:300;letter-spacing:0.15em;color:var(--text-primary);margin-bottom:0.5rem;">我的奥德赛时期</h1>
+        <div style="font-size:0.8rem;color:var(--text-secondary);letter-spacing:0.3em;">一段漂泊与归途的记录</div>
+        <div style="margin-top:2.5rem;padding:1.5rem;background:rgba(107,140,206,0.05);border:1px solid var(--border);border-radius:10px;">
+          <div style="font-size:0.95rem;color:var(--text-secondary);line-height:2;font-style:italic;">
+            "奥德修斯航行了十年才到家，<br>我也要走好自己的那段路。"
+          </div>
+        </div>
+      </div>
+    `
+  },
+  {
+    label: '写在开始',
+    content: `
+      <div class="entry-date">INTRO</div>
+      <div class="entry-title">写在开始</div>
+      <div class="entry-body">每个人都有属于自己的奥德赛时期——那是一段看似在迷路、却其实正在找自己的日子。没有确定的目的地，没有清晰的地图，只有风、浪、和一艘不愿靠岸的船。</div>
+      <div class="entry-body">这份记录，是我给自己的一份温柔的档案。不是为了谁看，只为在未来某一天回望时，能对当下的自己说一声："你看，你真的走过来了。"</div>
+      <div class="entry-body">从今天起，我会每天记录一点点——可能是一个瞬间、一种心情、一件小事、一个想通的道理。日子堆起来，就是答案。</div>
+      <div class="entry-divider">— ✦ —</div>
+    `
+  },
+  {
+    label: '4月28日',
+    content: `
+      <div class="entry-date">2026年4月28日 · 周二</div>
+      <div class="entry-title">每日记录</div>
+
+      <div class="entry-section-label">【今日心境】</div>
+      <div class="entry-body">今天到目前为止都比较平静，但平静下面藏着一点紧张——马上要需求评审了。紧张是真的，但好像也没到慌的地步。像是暴风雨前那种把一切都摊开来等一等的感觉。</div>
+      <div class="entry-body">内心另一层，是隔着一段距离的恍惚。那件事情已经过去一个月了，可回头看，真的有种恍如隔世的错觉。时间过得很慢，也很快。</div>
+
+      <div class="entry-section-label">【今日记事】</div>
+      <div class="entry-body">▸ 上午和 Nick 讨论五一去哪里玩。讨论来讨论去、绕了一大圈，最后还是回到泰国🇹🇭——不想把所有时间都花在越南。两个人认真地讨论了半天，得出了一个本来就想好的答案，真的是挺好笑的。</div>
+      <div class="entry-body">▸ 偷偷看了一眼内审的调查文档，昨晚有人看过了。不知道什么时候出结果，心里做好了可能要留处分的准备。但事情发生到现在，已经过去一个月，像是很久远的事了。</div>
+      <div class="entry-body">▸ 下午准备面对需求评审。稳住。</div>
+      <div class="entry-body">▸ 下午的时候，老板突然在微信上发了一句话，然后又立刻撤回了。就那么几秒钟，看见了一行字，还没来得及看清，就消失了。发出的那一刻他是想说点什么的，但他选择不说。这比完全沉默更伤人。</div>
+      <div class="entry-body">▸ 这就是坐冷板凳的感觉吧。以前每天密集的讨论，现在是非必要不沟通。俨然已经变成了一个快要出局的棋子♟️——maybe，已经出局了。虽然早有心理准备，但真的置身于内的时候，还是觉得难以接受。也别无他法。</div>
+
+      <div class="entry-section-label">【给自己的一句话】</div>
+      <div class="entry-quote">紧张也好，恍惚也好，都是真实的。结果会来，日子也会继续——你只需要把今天走完就好。</div>
+    `
+  },
+  {
+    label: '慢慢想明白',
+    content: `
+      <div class="entry-date">INSIGHTS</div>
+      <div class="entry-title">慢慢想明白的事</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.8;margin-bottom:2rem;">这里收集那些不属于某一天、却是某一天突然长出来的想法。它们不一定能马上派上用场，但会在未来某个时刻，悄悄扶你一把。</div>
+
+      <div class="entry-section-label">关于「渡过」与「解决」</div>
+      <div class="entry-quote">"不管结果怎么样，你已经在往前走了。"</div>
+      <div class="entry-body">人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。</div>
+      <div class="entry-body">解决是动词，渡过是状态。解决需要答案，渡过只需要时间和一些温柔的话——像扶着河边的栏杆慢慢走过桥。没有战胜，只是每天都继续生活。然后有一天回头一看，桥已经在身后了。</div>
+
+      <div class="entry-section-label">关于「战胜」与「共存」</div>
+      <div class="entry-quote">"你没有战胜那件事，你只是每天都继续生活。"</div>
+      <div class="entry-body">「战胜」这个词本身就有问题——它假设了你和那件事是对立的，必须把它打倒、踩在脚下、才算过关。</div>
+      <div class="entry-body">但那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。</div>
+      <div class="entry-body">能做的只是——让它变小一点。不是消失，是比例变小。一个月前，它可能占据你生活的 90%。今天，它只是你偷偷看一眼内审文档的那 10 秒钟。剩下的时间，你在和 Nick 讨论泰国、在准备评审、在记录这份文档。</div>
+      <div class="entry-body">它没有变小——是你的生活长大了。</div>
+
+      <div class="entry-section-label">关于「出局」与「棋子」</div>
+      <div class="entry-quote">"棋子被出局，是因为棋局结束了，或者换了一盘棋。可是你的人生不是一盘棋。"</div>
+      <div class="entry-body">老板撤回的那条消息，比完全沉默更伤人。他想说点什么，但最后选择了不说——这本身就是一种信息。</div>
+      <div class="entry-body">冷板凳的滋味，不只是被遗忘，更是眼睁睁看着自己在这艘船上变得可有可无。不是位置上的出局，是存在感的出局。</div>
+      <div class="entry-body">但棋局可以结束，你还在。你还在和 Nick 讨论五一去哪里玩，你还在记录这份文档，你还在往前走。出局的是那个角色，不是你这个人。</div>
+    `
   }
+];
+
+const insights = [
+  {
+    meta: '4月28日 · 关于「渡过」与「解决」',
+    quote: '"不管结果怎么样，你已经在往前走了。"',
+    text: '人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。\n\n解决是动词，渡过是状态。\n解决需要答案，渡过只需要时间和一些温柔的话——像扶着河边的栏杆慢慢走过桥。没有战胜，只是每天都继续生活。然后有一天回头一看，桥已经在身后了。'
+  },
+  {
+    meta: '4月28日 · 关于「战胜」与「共存」',
+    quote: '"你没有战胜那件事，你只是每天都继续生活。"',
+    text: '「战胜」这个词本身就有问题——它假设了你和那件事是对立的，必须把它打倒、踩在脚下、才算过关。\n\n但那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。\n\n能做的只是——让它变小一点。不是消失，是比例变小。\n\n一个月前，它可能占据你生活的 90%。今天，它只是你偷偷看一眼内审文档的那 10 秒钟。剩下的时间，你在和 Nick 讨论泰国、在准备评审、在记录这份文档。\n\n它没有变小——是你的生活长大了。'
+  },
+  {
+    meta: '4月28日 · 关于「出局」与「棋子」',
+    quote: '"棋子被出局，是因为棋局结束了，或者换了一盘棋。可是你的人生不是一盘棋。"',
+    text: '老板撤回的那条消息，比完全沉默更伤人。他想说点什么，但最后选择了不说——这本身就是一种信息。\n\n冷板凳的滋味，不只是被遗忘，更是眼睁睁看着自己在这艘船上变得可有可无。不是位置上的出局，是存在感的出局。\n\n但棋局可以结束，你还在。你还在和 Nick 讨论五一去哪里玩，你还在记录这份文档，你还在往前走。出局的是那个角色，不是你这个人。'
+  }
+];
+
+// ===== BOOK LOGIC =====
+let currentPage = 0;
+const book = document.getElementById('book');
+const dotsEl = document.getElementById('progress-dots');
+const labelEl = document.getElementById('page-label');
+const navHint = document.getElementById('nav-hint');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+
+function buildDots() {
+  dotsEl.innerHTML = '';
+  pages.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'pdot';
+    if (i === 0) d.classList.add('active');
+    else if (i < currentPage) d.classList.add('done');
+    dotsEl.appendChild(d);
+  });
 }
 
-function prevPage() {
-  if (currentPage > 0) {
-    showPage(currentPage - 1);
-    updateDots();
-  }
+function renderPage(idx, dir) {
+  const existing = book.querySelector('.page');
+  if (existing) existing.remove();
+
+  const p = document.createElement('div');
+  p.className = 'page page-enter';
+  p.innerHTML = `<div class="page-inner">${pages[idx].content}</div>`;
+  book.appendChild(p);
+
+  labelEl.textContent = pages[idx].label;
+  buildDots();
+  prevBtn.disabled = idx === 0;
+  nextBtn.disabled = idx === pages.length - 1;
+  currentPage = idx;
 }
 
-// Keyboard navigation
+function enterBook() {
+  document.getElementById('cover').classList.add('fade-out');
+  document.getElementById('topbar').classList.add('visible');
+  navHint.classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('cover').style.display = 'none';
+    renderPage(1);
+  }, 1500);
+}
+
+function goPage(n) {
+  if (n < 0 || n >= pages.length) return;
+  const existing = book.querySelector('.page');
+  if (existing) existing.classList.add('page-exit');
+  setTimeout(() => renderPage(n), 300);
+}
+
+function prevPage() { goPage(currentPage - 1); }
+function nextPage() { goPage(currentPage + 1); }
+
 document.addEventListener('keydown', e => {
-  if (document.getElementById('cover').style.visibility === 'hidden') {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextPage(); updateDots(); }
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevPage(); updateDots(); }
-    if (e.key === 'Escape') { closeSearch(); }
-  }
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextPage(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevPage(); }
 });
 
-// Touch swipe
 let touchStartX = 0;
 document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
 document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) > 60) {
-    if (dx < 0) { nextPage(); updateDots(); }
-    else { prevPage(); updateDots(); }
-  }
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(dx) > 60) { if (dx > 0) nextPage(); else prevPage(); }
 });
 
-// ==================== COVER ====================
-function enterBook() {
-  document.getElementById('cover').classList.add('fade-out');
-  setTimeout(() => {
-    document.getElementById('cover').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    buildDots();
-    showPage(0);
-  }, 1600);
+// ===== CARDS =====
+function buildCards() {
+  const wall = document.getElementById('cards-wall');
+  wall.innerHTML = '';
+  insights.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'fcard';
+    card.innerHTML = `<div class="fcard-meta">${c.meta}</div><div class="fcard-quote">${c.quote}</div><div class="fcard-ref">${c.text.substring(0, 60)}...</div>`;
+    card.onclick = () => openCard(i);
+    wall.appendChild(card);
+  });
 }
 
-// ==================== SEARCH ====================
-function openSearch() {
-  document.getElementById('search-overlay').classList.add('active');
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-input').focus();
-  document.getElementById('search-results').innerHTML = '';
+function openCards() {
+  buildCards();
+  document.getElementById('cards-overlay').classList.add('open');
 }
-
-function closeSearch() {
-  document.getElementById('search-overlay').classList.remove('active');
+function closeCards() { document.getElementById('cards-overlay').classList.remove('open'); }
+function openCard(i) {
+  const c = insights[i];
+  document.getElementById('card-modal-quote').textContent = c.quote;
+  document.getElementById('card-modal-text').textContent = c.text;
+  document.getElementById('card-modal').classList.add('open');
 }
+function closeCardModal() { document.getElementById('card-modal').classList.remove('open'); }
 
-const searchData = [
-  { label: '每日记录 · 4月28日', text: '今天到目前为止都比较平静，但平静下面藏着一点紧张——马上要需求评审了。' },
-  { label: '每日记录 · 4月28日', text: '上午和 Nick 讨论五一去哪里玩。讨论来讨论去、绕了一大圈，最后还是回到泰国🇹🇭。' },
-  { label: '每日记录 · 4月28日', text: '偷偷看了一眼内审的调查文档，昨晚有人看过了。不知道什么时候出结果。' },
-  { label: '慢慢想明白的事 · 关于「渡过」与「解决」', text: '人在遇到事情的时候，总想马上找到答案、马上解决。但很多事情其实是悬而未决的，是靠一些话、一些日常、一些温柔慢慢渡过的。' },
-  { label: '慢慢想明白的事 · 关于「渡过」与「解决」', text: '解决是动词，渡过是状态。' },
-  { label: '慢慢想明白的事 · 关于「战胜」与「共存」', text: '你没有战胜那件事，你只是每天都继续生活。' },
-  { label: '慢慢想明白的事 · 关于「战胜」与「共存」', text: '那件事也是你的一部分。它发生在你的人生里，构成了你的一段时间。你没法战胜它，就像你没法战胜自己的影子。' },
-  { label: '慢慢想明白的事 · 关于「战胜」与「共存」', text: '它没有变小——是你的生活长大了。' },
-];
+// ===== SEARCH =====
+const allText = pages.map(p => p.content.replace(/<[^>]+>/g, '')).join('\n');
 
-function doSearch() {
-  const q = document.getElementById('search-input').value.trim();
-  const resultsEl = document.getElementById('search-results');
-  if (!q) { resultsEl.innerHTML = ''; return; }
-  const results = searchData.filter(item =>
-    item.text.includes(q) || item.label.includes(q)
-  );
-  if (results.length === 0) {
-    resultsEl.innerHTML = '<div id="search-empty">没有找到相关内容</div>';
-    return;
-  }
-  resultsEl.innerHTML = results.map(r => {
-    const highlighted = r.text.replace(new RegExp(q, 'g'), `<em>${q}</em>`);
-    return `<div class="search-result-item" onclick="jumpToSearchResult('${r.label}')">
-      <div class="search-result-label">${r.label}</div>
-      <div class="search-result-text">${highlighted}</div>
-    </div>`;
-  }).join('');
-}
-
-function jumpToSearchResult(label) {
-  closeSearch();
-  if (label.includes('慢慢想明白')) {
-    showPage(4);
+function doSearch(q) {
+  const res = document.getElementById('search-results');
+  if (!q.trim()) { res.innerHTML = ''; return; }
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(escaped, 'gi');
+  const matches = [...allText.matchAll(new RegExp(escaped, 'gi'))];
+  let html = '';
+  if (matches.length === 0) {
+    html = '<div style="color:var(--text-muted);text-align:center;padding:1rem;">没有找到相关内容</div>';
   } else {
-    showPage(2);
+    const idx = matches[0].index;
+    const start = Math.max(0, idx - 40);
+    const end = Math.min(allText.length, idx + 100);
+    let snippet = allText.substring(start, end).replace(re, m => `<mark>${m}</mark>`);
+    if (start > 0) snippet = '...' + snippet;
+    if (end < allText.length) snippet = snippet + '...';
+    html = `<div class="sr-item">${snippet}</div>`;
   }
-  updateDots();
+  res.innerHTML = html;
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeSearch();
-});
-
-// ==================== CARD WALL ====================
-function buildCardWall() {
-  const grid = document.getElementById('card-grid');
-  grid.innerHTML = insights.map((ins, i) => `
-    <div class="wall-card" onclick="this.classList.toggle('expanded')">
-      <div class="wall-card-theme">${ins.theme}</div>
-      <div class="wall-card-quote">${ins.quote}</div>
-      <div class="wall-card-date">${ins.date}</div>
-      <div class="wall-card-detail">${ins.body}</div>
-    </div>
-  `).join('');
-}
-
-function toggleCardWall() {
-  const wall = document.getElementById('card-wall');
-  const isActive = wall.classList.toggle('active');
-  if (isActive) buildCardWall();
-}
-
-// ==================== PRINT ====================
-function printDoc() {
-  window.print();
-}
-
-// ==================== INIT ====================
-// After cover fades, app stays hidden until enter clicked
+function openSearch() { document.getElementById('search-overlay').classList.add('open'); document.getElementById('search-input').focus(); }
+function closeSearch() { document.getElementById('search-overlay').classList.remove('open'); document.getElementById('search-input').value = ''; document.getElementById('search-results').innerHTML = ''; }
+document.getElementById('search-input').addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
 </script>
 </body>
 </html>
